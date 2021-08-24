@@ -12,6 +12,14 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// realtime connection & disconnection
+io.console("connection", (socket) => {
+  console.log("we have a new connectio!");
+  socket.on("disconnect", () => {
+    console.log("User had left!!");
+  });
+});
+
 app.use(router);
 
 // 서버 시작
