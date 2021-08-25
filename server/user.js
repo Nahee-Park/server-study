@@ -36,6 +36,6 @@ const removeUser = (id) => {
 const getUser = (id) => users.find((user) => user.id === id);
 
 //room을 받아서 그 room에 있는 user들만 찾아줌
-const getUserInRoom = (room) => users.filter((user) => user.room === room);
+const getUsersInRoom = (room) => users.filter((user) => user.room === room);
 
-module.exports = { addUser, removeUser, getUser, getUserInRoom };
+module.exports = { addUser, removeUser, getUser, getUsersInRoom };

@@ -1,14 +1,10 @@
 const express = require("express");
 // realtime 통신할 땐 http보다 socket 사용
 const http = require("http");
-const socketio = require("socket.io")(httpServer, {
-  cors: {
-    origin: "http://localhost:3000",
-  },
-});
+const socketio = require("socket.io");
 // const cors = require("cors");
 
-const { addUser, removeUser, getUser, getUserInRoom } = require("./user.js");
+const { addUser, removeUser, getUser, getUsersInRoom } = require("./user.js");
 
 // 특정 포트 있으면 거기로 아니면 5000번
 const PORT = process.env.PORT || 5000;
@@ -49,19 +45,38 @@ io.on("connection", (socket) => {
     // .join메소드 -> 유저를 룸에 포함시킴
     socket.join(user.room);
 
+    //딱 들어왔을 때 roomData를 방출 -> user의 room 정보랑, 그 방에 있는 유저들 정보
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
+
     callback();
   });
 
   socket.on("sendMessage", (message, callback) => {
     const user = getUser(socket.id);
 
+    // 메시지 보낼 때 방출할 데이터들의 이벤트 명과 데이터들
     io.to(user.room).emit("message", { user: user.name, text: message });
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room),
+    });
 
-    // 프론트에서 메시지 보낸 이후에 무언가를 할 수 있도록
+    // 프론트에서 메시지  보낸 이후에 무언가를 할 수 있도록
     callback();
   });
+
+  // 연결 끊겼을 때
   socket.on("disconnect", () => {
-    console.log("User had left!!");
+    const user = removeUser(socket.id);
+    if (user) {
+      io.to(user.room).emit("message", {
+        user: "admin",
+        text: `${user.name} has left`,
+      });
+    }
   });
 });
 
