@@ -7,7 +7,12 @@ app.listen(8080, function () {
   console.log("listening on 8080");
 });
 
+// .sefFile을 통해 파일을 보냄
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/index.html");
+});
+
 // 특정 라우팅 엔드포인트로 들어오면 GET해서 보여주도록
 app.get("/pet", function (req, res) {
-  res.send("펫용품 쇼핑할 수 있는 페이지입니다.");
+  res.send("우헤 펫용품 쇼핑할 수 있는 페이지입니다.");
 });
