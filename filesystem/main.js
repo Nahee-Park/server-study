@@ -14,6 +14,8 @@ var app = http.createServer(function (request, response) {
     return;
   }
   response.writeHead(200);
+  var template = `
+  `;
 
   //사용자가 접근할 때마다 읽어들여야 할 파일로부터 읽고, 그 값을 가져오고 그것을 response.end에 위치시킴
   // 어떤 코드를 넣느냐에 따라서 사용자에게 전송하는 데이터가 바뀜 -> 사용자에게 전송할 데이터를 생성한다 라는 것이 노드제이에서의 힘
