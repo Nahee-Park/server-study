@@ -47,6 +47,7 @@ app.post("/add", (req, res) => {
   // 총 게시물 갯수를 가지고 콜렉션을 따로 만듦
   db.collection("counter").findOne({ name: "게시물 갯수" }, (error, result) => {
     console.log(result.totalPost);
+    // 일단 토탈 포스트 counter 클라스터에서 가져옴
     let postCounter = result.totalPost;
 
     // 특정 클러스터에 데이터 보내기
@@ -57,11 +58,12 @@ app.post("/add", (req, res) => {
         date: req.body.date,
       },
       (error, result) => {
+        // 데이터 보낸 이후에 totalPost 카운트 증가시킴(counter 클러스터는 전역변수 관리하는 용도로 쓰임)
         db.collection("counter").updateOne(
           { name: "게시물 갯수" },
           // $inc totalPost 1 증가시키는 operator 문법
           { $inc: { totalPost: 1 } },
-          function (에러, 결과) {
+          (error, result) => {
             console.log("수정완료");
           }
         );
@@ -69,8 +71,6 @@ app.post("/add", (req, res) => {
       }
     );
   });
-
-  // counter 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야 함
 });
 
 // 누가 /list로 접속하면 받은 데이터들을 보여줌
@@ -79,10 +79,21 @@ app.get("/list", (req, res) => {
   db.collection("post")
     .find()
     .toArray((error, result) => {
-      console.log(result);
+      // console.log(result);
 
       // ejs파일은 view 폴더 안에 넣어야 함
       // db에서 찾은 collection을 ejs에 보냄
       res.render("list.ejs", { data: result });
     });
+});
+
+// 삭제 코드
+app.delete("/delete", (req, res) => {
+  // 문자값으로 들어온 것을 정수로 변환
+  req.body._id = parseInt(req.body._id);
+  console.log(req.body);
+  db.collection("post").deleteOne(req.body, (error, result) => {
+    console.log("삭제 완료");
+  });
+  res.send("삭제 완료");
 });
