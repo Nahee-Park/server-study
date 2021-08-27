@@ -32,16 +32,24 @@ function Chat() {
         </Styled.ChatRooms>
         <Styled.ChatSpace>
           <Styled.ChatBoxes>
-            <UncontrolledDropdown inNavbar>
-              <DropdownToggle nav caret>
-                참여자
-              </DropdownToggle>
-              <DropdownMenu right>
-                <DropdownItem>참여자1</DropdownItem>
-                <DropdownItem>참여자2</DropdownItem>
-              </DropdownMenu>
-            </UncontrolledDropdown>
-            {/* 메시지 내용 들어오면 map시킬 것 */}
+            <div className="chat__btns">
+              <UncontrolledDropdown inNavbar>
+                <DropdownToggle nav caret>
+                  참여자
+                </DropdownToggle>
+                <DropdownMenu right>
+                  {/* map돌릴 건데 디폴트는 admin */}
+                  <DropdownItem>참여자1</DropdownItem>
+                  <DropdownItem>참여자2</DropdownItem>
+                </DropdownMenu>
+              </UncontrolledDropdown>
+              <Button outline color="success">
+                Join Room
+              </Button>
+            </div>
+            <div className="chat__contents">
+              {/* 메시지 내용 들어오면 map시킬 것 */}
+            </div>
           </Styled.ChatBoxes>
           <InputGroup>
             <Input placeholder="전송할 메시지를 적어주세요" />
@@ -84,6 +92,15 @@ const Styled = {
   `,
   ChatSpace: styled.div`
     width: 70%;
+    .chat {
+      &__btns {
+        display: flex;
+        justify-content: space-between;
+      }
+      &__contents {
+        height: 95%;
+      }
+    }
   `,
   ChatBoxes: styled.div`
     height: 613px;
