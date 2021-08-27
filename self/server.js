@@ -1,14 +1,29 @@
 const express = require("express");
 // 라이브러리를 바탕으로 객체 설정
 const app = express();
+let db;
+const MongoClient = require("mongodb").MongoClient;
+// 뷰 엔진으로 ejs를 쓰겠다는 뜻
+app.set("view engine", "ejs");
 
-// req 풀기 위한 코드
+MongoClient.connect(
+  "mongodb+srv://admin:13243543qq@cluster0.3bsm9.mongodb.net/todoapp?retryWrites=true&w=majority",
+  (error, client) => {
+    // 데이터 연결되면 할 일
+    if (error) return console.log(error);
+
+    // db연결
+    db = client.db("todoapp");
+
+    // 데이터 들어오면 서버 띄우기 , 외부에서 이 포트로 들어왔을 때 어떤 행위할 지를 알려줌
+    app.listen(8080, () => {
+      console.log("listening on 8080");
+    });
+  }
+);
+
+// req 풀기 위한 코드 (미들웨어가 요청 받은 것들을 풀어줘야 서버에서 해석 가능)
 app.use(express.urlencoded({ extended: true }));
-
-// 서버 띄우기 , 외부에서 이 포트로 들어왔을 때 어떤 행위할 지를 알려줌
-app.listen(8080, () => {
-  console.log("listening on 8080");
-});
 
 // .sefFile을 통해 파일을 보냄
 app.get("/", (req, res) => {
@@ -27,7 +42,47 @@ app.get("/write", (req, res) => {
 
 // post요청을 받을 시 /add로 라우팅되고 콜백함수 내의 내용을 실행
 app.post("/add", (req, res) => {
-  // 클라로부터 받은 값은 req에 저장되어 있음 -> 이걸 풀기 위해선 express의 메소드를 이용해야함
-  console.log(req.body.title);
   res.send("전송완료");
+
+  // 총 게시물 갯수를 가지고 콜렉션을 따로 만듦
+  db.collection("counter").findOne({ name: "게시물 갯수" }, (error, result) => {
+    console.log(result.totalPost);
+    let postCounter = result.totalPost;
+
+    // 특정 클러스터에 데이터 보내기
+    db.collection("post").insertOne(
+      {
+        _id: postCounter + 1,
+        title: req.body.title,
+        date: req.body.date,
+      },
+      (error, result) => {
+        db.collection("counter").updateOne(
+          { name: "게시물 갯수" },
+          // $inc totalPost 1 증가시키는 operator 문법
+          { $inc: { totalPost: 1 } },
+          function (에러, 결과) {
+            console.log("수정완료");
+          }
+        );
+        console.log("받은 데이터 저장 완료");
+      }
+    );
+  });
+
+  // counter 콜렉션에 있는 totalPost라는 항목도 1 증가시켜야 함
+});
+
+// 누가 /list로 접속하면 받은 데이터들을 보여줌
+app.get("/list", (req, res) => {
+  // 디비에 저장된 post라는 collection 안의 모든 데이터를 꺼내주세요
+  db.collection("post")
+    .find()
+    .toArray((error, result) => {
+      console.log(result);
+
+      // ejs파일은 view 폴더 안에 넣어야 함
+      // db에서 찾은 collection을 ejs에 보냄
+      res.render("list.ejs", { data: result });
+    });
 });
