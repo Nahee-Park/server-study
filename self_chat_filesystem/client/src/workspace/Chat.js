@@ -8,18 +8,27 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
+  ListGroup,
+  ListGroupItem,
 } from "reactstrap";
 import styled from "styled-components";
 
 function Chat() {
-  const [isOpen, setIsOpen] = useState(false);
-
-  const toggle = () => setIsOpen(!isOpen);
   return (
     <Styled.Root>
       <Styled.ChatWrapper>
         <Styled.ChatRooms>
-          {/* 각각 채팅방 들어오면 map시킬 것 */}
+          <div className="room_title">
+            <h4>채팅방 목록</h4>
+          </div>
+          <div className="room_list">
+            {/* 각각 채팅방 들어오면 map시킬 것 */}
+            <ListGroup>
+              <ListGroupItem tag="a" href="#" action>
+                Cras justo odio
+              </ListGroupItem>
+            </ListGroup>
+          </div>
         </Styled.ChatRooms>
         <Styled.ChatSpace>
           <Styled.ChatBoxes>
@@ -61,6 +70,17 @@ const Styled = {
     width: 30%;
     height: 100%;
     background-color: beige;
+    .room {
+      &_title {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      &_list {
+        height: 94%;
+        overflow-y: scroll;
+      }
+    }
   `,
   ChatSpace: styled.div`
     width: 70%;
