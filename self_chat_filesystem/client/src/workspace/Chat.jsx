@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Message from "../component/Message";
 import {
   InputGroup,
   InputGroupAddon,
@@ -49,6 +50,7 @@ function Chat() {
             </div>
             <div className="chat__contents">
               {/* 메시지 내용 들어오면 map시킬 것 */}
+              <Message />
             </div>
           </Styled.ChatBoxes>
           <InputGroup>
@@ -99,6 +101,7 @@ const Styled = {
       }
       &__contents {
         height: 95%;
+        overflow-y: scroll;
       }
     }
   `,

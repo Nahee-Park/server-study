@@ -1,6 +1,6 @@
 import React from "react";
-import Chat from "./workspace/Chat";
-import FileSystem from "./workspace/FileSystem";
+import Chat from "./workspace/Chat.jsx";
+import FileSystem from "./workspace/FileSystem.jsx";
 import styled from "styled-components";
 
 function App() {
