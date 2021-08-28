@@ -22,10 +22,23 @@ let socket;
 function Chat() {
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
+  const [message, setMessage] = useState("");
+
+  const setMessages = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    if (message) {
+      socket.emit("message", message, () => {
+        setMessage("");
+      });
+    }
+  };
 
   useEffect(() => {
     socket = io(ENDPOINT);
-    socket.emit("message", "첫번째 메시지예요");
   }, []);
 
   return (
@@ -68,9 +81,15 @@ function Chat() {
             </div>
           </Styled.ChatBoxes>
           <InputGroup>
-            <Input placeholder="전송할 메시지를 적어주세요" />
+            <Input
+              placeholder="전송할 메시지를 적어주세요"
+              value={message}
+              onChange={setMessages}
+            />
             <InputGroupAddon addonType="append">
-              <Button color="secondary">전송</Button>
+              <Button color="secondary" onClick={sendMessage}>
+                전송
+              </Button>
             </InputGroupAddon>
           </InputGroup>
         </Styled.ChatSpace>

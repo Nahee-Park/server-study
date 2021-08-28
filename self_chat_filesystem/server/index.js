@@ -38,5 +38,6 @@ io.on("connection", (socket) => {
 
   socket.on("message", (data) => {
     console.log("첫 메시지 왔어요");
+    console.log(data);
   });
 });
