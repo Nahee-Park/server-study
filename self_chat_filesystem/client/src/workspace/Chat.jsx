@@ -20,6 +20,7 @@ const ENDPOINT = "localhost:8080";
 let socket;
 
 function Chat() {
+  const user = "nahee";
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
   const [message, setMessage] = useState("");
@@ -82,7 +83,12 @@ function Chat() {
               </Button>
             </div>
             <div className="chat__contents">
-              <JoinModal modal={modal} toggle={toggle} setModal={setModal} />
+              <JoinModal
+                modal={modal}
+                toggle={toggle}
+                setModal={setModal}
+                user={user}
+              />
               {messageList &&
                 messageList.map((prevMessage) => {
                   return <Message prevMessage={prevMessage} />;

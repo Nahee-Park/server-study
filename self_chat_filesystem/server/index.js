@@ -46,18 +46,38 @@ io.on("connection", (socket) => {
 const chatRoom = io.of("/채팅방1");
 
 app.post("/room", (req, res) => {
-  res.send(200, req.body);
+  res.send(req.body);
   //받은 room이 없는 방이면 db에 새로 추가
   db.collection("chat")
     .find({ room: req.body.room })
     .toArray((error, result) => {
-      console.log(result);
       if (result.length === 0) {
-        db.collection("chat").insertOne(req.body, (err, result) => {
-          console.log("저장됨!");
-        });
+        db.collection("chat").insertOne(
+          { room: req.body.room, user: [req.body.user] },
+          (err, result) => {
+            console.log("저장됨!");
+          }
+        );
       }
     });
 
-  //   console.log(req.body);
+  //이 채팅방의 user를 점검해서 req.body.user가 없다면 추가
+  db.collection("chat")
+    .find({ room: req.body.room })
+    .toArray((error, result) => {
+      console.log(result[0].user);
+      const prevusers = result[0].user;
+      let isUserHere = false;
+      console.log("일단 유저 있어서 배열 돌 예정임");
+      prevusers.forEach((element) => {
+        if (element == req.body.user) {
+          isUserHere = true;
+        }
+      });
+      // user가 없으면 새로운 유저 push
+      !isUserHere &&
+        db
+          .collection("chat")
+          .update({ room: req.body.room }, { $push: { user: req.body.user } });
+    });
 });

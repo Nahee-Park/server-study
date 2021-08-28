@@ -3,10 +3,11 @@ import axios from "axios";
 
 const url = "http://localhost:8080/room";
 
-export const postRoom = async (room) => {
+export const postRoom = async (room, user) => {
   try {
     const data = await axios.post(`${url}`, {
       room: `${room}`,
+      user: `${user}`,
     });
     console.log(data);
     return data;
