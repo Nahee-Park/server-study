@@ -47,5 +47,9 @@ const chatRoom = io.of("/채팅방1");
 
 app.post("/room", (req, res) => {
   res.send(200, req.body);
+  //받은 room이 중복되면 해당 room을 불러오고, 없으면 새로 저장
+  db.collection("chat").insertOne(req.body, (err, result) => {
+    console.log("저장됨!");
+  });
   console.log(req.body);
 });
