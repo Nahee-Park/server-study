@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Message from "../component/Message";
+import JoinModal from "../component/JoinModal";
 import {
   InputGroup,
   InputGroupAddon,
@@ -13,8 +14,17 @@ import {
   ListGroupItem,
 } from "reactstrap";
 import styled from "styled-components";
+import io from "socket.io-client";
+
+const ENDPOINT = "localhost:8080";
+let socket;
 
 function Chat() {
+  const [modal, setModal] = useState(false);
+  const toggle = () => setModal(!modal);
+
+  socket = io(ENDPOINT);
+
   return (
     <Styled.Root>
       <Styled.ChatWrapper>
@@ -44,11 +54,12 @@ function Chat() {
                   <DropdownItem>참여자2</DropdownItem>
                 </DropdownMenu>
               </UncontrolledDropdown>
-              <Button outline color="success">
+              <Button outline color="success" onClick={toggle}>
                 Join Room
               </Button>
             </div>
             <div className="chat__contents">
+              <JoinModal modal={modal} toggle={toggle} />
               {/* 메시지 내용 들어오면 map시킬 것 */}
               <Message />
             </div>
