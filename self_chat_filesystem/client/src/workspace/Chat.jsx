@@ -23,7 +23,10 @@ function Chat() {
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
   const [message, setMessage] = useState("");
+  const [messageList, setMessageList] = useState([]);
+  // let messageList = [];
 
+  // 메시지 세팅
   const setMessages = (e) => {
     setMessage(e.target.value);
   };
@@ -39,7 +42,11 @@ function Chat() {
 
   useEffect(() => {
     socket = io(ENDPOINT);
-  }, []);
+    socket.on("allMessage", (data) => {
+      console.log(data);
+      setMessageList([...messageList, data]);
+    });
+  }, [messageList]);
 
   return (
     <Styled.Root>
@@ -76,8 +83,10 @@ function Chat() {
             </div>
             <div className="chat__contents">
               <JoinModal modal={modal} toggle={toggle} />
-              {/* 메시지 내용 들어오면 map시킬 것 */}
-              <Message />
+              {messageList &&
+                messageList.map((prevMessage) => {
+                  return <Message prevMessage={prevMessage} />;
+                })}
             </div>
           </Styled.ChatBoxes>
           <InputGroup>

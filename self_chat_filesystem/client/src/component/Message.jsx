@@ -1,7 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
-function Message() {
+function Message({ prevMessage }) {
   // { message: { text, user }, name }
   const user = "nahee";
   const name = "nahee";
@@ -18,12 +18,12 @@ function Message() {
   return isSentByCurrentUser ? (
     //   현재 유저이면 이거 리턴
     <Styled.Root isSentByCurrentUser={isSentByCurrentUser}>
-      <Styled.Message>이건 나야</Styled.Message>
+      <Styled.Message>{prevMessage}</Styled.Message>
     </Styled.Root>
   ) : (
     //   아니면 이거 리턴
     <Styled.Root>
-      <Styled.Message>안녕 온 걸 환영해</Styled.Message>
+      <Styled.Message>{prevMessage}</Styled.Message>
       <Styled.Sender>admin</Styled.Sender>
     </Styled.Root>
   );
