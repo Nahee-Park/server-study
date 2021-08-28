@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Message from "../component/Message";
 import JoinModal from "../component/JoinModal";
 import {
@@ -23,7 +23,10 @@ function Chat() {
   const [modal, setModal] = useState(false);
   const toggle = () => setModal(!modal);
 
-  socket = io(ENDPOINT);
+  useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("message", "첫번째 메시지예요");
+  }, []);
 
   return (
     <Styled.Root>

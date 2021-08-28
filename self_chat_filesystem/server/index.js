@@ -8,6 +8,9 @@ const io = require("socket.io")(http, {
   },
 });
 
+const cors = require("cors");
+app.use(cors());
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
@@ -32,4 +35,8 @@ MongoClient.connect(
 // socket에 연결을 하면 일어날 일들
 io.on("connection", (socket) => {
   console.log("연결 되었어요");
+
+  socket.on("message", (data) => {
+    console.log("첫 메시지 왔어요");
+  });
 });
