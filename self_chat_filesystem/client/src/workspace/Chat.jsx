@@ -82,7 +82,7 @@ function Chat() {
               </Button>
             </div>
             <div className="chat__contents">
-              <JoinModal modal={modal} toggle={toggle} />
+              <JoinModal modal={modal} toggle={toggle} setModal={setModal} />
               {messageList &&
                 messageList.map((prevMessage) => {
                   return <Message prevMessage={prevMessage} />;

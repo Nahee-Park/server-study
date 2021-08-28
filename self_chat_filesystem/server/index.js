@@ -11,8 +11,8 @@ const io = require("socket.io")(http, {
 const cors = require("cors");
 app.use(cors());
 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 const MongoClient = require("mongodb").MongoClient;
 
 // 정적 파일을 업로드 하기 위한 가상의 경로를 /public에 넣음
@@ -41,4 +41,11 @@ io.on("connection", (socket) => {
     console.log(data);
     io.emit("allMessage", data);
   });
+});
+
+const chatRoom = io.of("/채팅방1");
+
+app.post("/room", (req, res) => {
+  res.send(200, req.body);
+  console.log(req.body);
 });
