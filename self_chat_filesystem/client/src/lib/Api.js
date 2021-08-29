@@ -16,3 +16,14 @@ export const postRoom = async (room, user) => {
     return e;
   }
 };
+
+export const getUsers = async () => {
+  try {
+    const data = await axios.get("http://localhost:8080/users");
+    console.log(data);
+    return data;
+  } catch (e) {
+    console.error("[FAIL] GET USERS", e);
+    return e;
+  }
+};

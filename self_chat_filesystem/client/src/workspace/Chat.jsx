@@ -15,6 +15,7 @@ import {
 } from "reactstrap";
 import styled from "styled-components";
 import io from "socket.io-client";
+import { getUsers } from "../lib/Api";
 
 const ENDPOINT = "localhost:8080";
 let socket;
@@ -28,6 +29,8 @@ function Chat() {
   const [completeRoom, setCompleteRoom] = useState(
     "dqeqfqaquqlqtq기q본q방qroom"
   );
+  const [users, setUsers] = useState([]);
+  const [data, setData] = useState();
   // let messageList = [];
 
   // 메시지 세팅
@@ -44,20 +47,38 @@ function Chat() {
     }
   };
 
+  const getUserArray = (data) => {
+    for (let i = 0; i < data.length; i++) {
+      if (data[i].room === completeRoom) {
+        setUsers(data[i].user);
+      }
+    }
+  };
+
+  // 이 함수 실행시킬 때 user들어옴
+  const getUserData = async () => {
+    const data = await getUsers();
+    setData(data.data);
+    await getUserArray(data.data);
+  };
+
   useEffect(() => {
     socket = io(ENDPOINT + "/" + completeRoom);
     socket.on("allMessage", (data) => {
       console.log(data);
       setMessageList([...messageList, data]);
     });
+    console.log(messageList);
+    getUserData();
   }, [messageList, completeRoom]);
+  console.log(users);
 
   return (
     <Styled.Root>
       <Styled.ChatWrapper>
         <Styled.ChatRooms>
           <div className="room_title">
-            <h4>채팅방 목록</h4>
+            <h4>참여자 목록</h4>
           </div>
           <div className="room_list">
             {/* 각각 채팅방 들어오면 map시킬 것 */}
@@ -71,16 +92,6 @@ function Chat() {
         <Styled.ChatSpace>
           <Styled.ChatBoxes>
             <div className="chat__btns">
-              <UncontrolledDropdown inNavbar>
-                <DropdownToggle nav caret>
-                  참여자
-                </DropdownToggle>
-                <DropdownMenu right>
-                  {/* map돌릴 건데 디폴트는 admin */}
-                  <DropdownItem>참여자1</DropdownItem>
-                  <DropdownItem>참여자2</DropdownItem>
-                </DropdownMenu>
-              </UncontrolledDropdown>
               <Button outline color="success" onClick={toggle}>
                 Join Room
               </Button>
@@ -149,11 +160,7 @@ const Styled = {
     .chat {
       &__btns {
         display: flex;
-        justify-content: space-between;
-      }
-      &__contents {
-        height: 95%;
-        overflow-y: scroll;
+        justify-content: flex-end;
       }
     }
   `,
