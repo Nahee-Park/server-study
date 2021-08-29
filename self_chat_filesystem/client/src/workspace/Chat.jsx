@@ -6,10 +6,6 @@ import {
   InputGroupAddon,
   Button,
   Input,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   ListGroup,
   ListGroupItem,
 } from "reactstrap";
@@ -69,6 +65,7 @@ function Chat() {
       setMessageList([...messageList, data]);
     });
     console.log(messageList);
+    console.log(users);
     getUserData();
   }, [messageList, completeRoom]);
   console.log(users);
@@ -85,9 +82,11 @@ function Chat() {
             <ListGroup>
               {users &&
                 users.map((user, key) => {
-                  <ListGroupItem tag="a" href="#" action>
-                    {user}
-                  </ListGroupItem>;
+                  return (
+                    <ListGroupItem tag="a" href="#" action>
+                      {user}
+                    </ListGroupItem>
+                  );
                 })}
             </ListGroup>
           </div>
