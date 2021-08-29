@@ -99,6 +99,5 @@ app.get("/users", (req, res) => {
     .find()
     .toArray((err, result) => {
       res.send(result);
-      console.log(result);
     });
 });

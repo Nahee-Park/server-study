@@ -44,11 +44,25 @@ function Chat() {
   };
 
   const getUserArray = (data) => {
+    let tempUsers = [];
+    let realUsers = [];
     for (let i = 0; i < data.length; i++) {
       if (data[i].room === completeRoom) {
-        setUsers(data[i].user);
+        tempUsers = data[i].user;
+        // setUsers(data[i].user);
       }
     }
+    let i = 1;
+    // 현재 유저를 가장 위로 저장하고 나머지는 그 밑으로 오도록
+    tempUsers.forEach((element) => {
+      if (element === user) {
+        realUsers[0] = element;
+      } else {
+        realUsers[i] = element;
+        i += 1;
+      }
+    });
+    setUsers(realUsers);
   };
 
   // 이 함수 실행시킬 때 user들어옴
@@ -70,6 +84,12 @@ function Chat() {
   }, [messageList, completeRoom]);
   console.log(users);
 
+  const joinPrivate = (e) => {
+    // 참여자를 클릭하면 그 참여자 이름으로 private room만들기
+    console.log(e.target.name);
+    socket.emit("private", e.target.name);
+  };
+
   return (
     <Styled.Root>
       <Styled.ChatWrapper>
@@ -83,7 +103,14 @@ function Chat() {
               {users &&
                 users.map((user, key) => {
                   return (
-                    <ListGroupItem tag="a" href="#" action>
+                    <ListGroupItem
+                      onClick={joinPrivate}
+                      key={key}
+                      tag="a"
+                      href="#"
+                      action
+                      name={user}
+                    >
                       {user}
                     </ListGroupItem>
                   );
@@ -108,7 +135,7 @@ function Chat() {
               />
               {messageList &&
                 messageList.map((prevMessage, key) => {
-                  return <Message prevMessage={prevMessage} />;
+                  return <Message key={key} prevMessage={prevMessage} />;
                 })}
             </div>
           </Styled.ChatBoxes>
