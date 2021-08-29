@@ -83,9 +83,12 @@ function Chat() {
           <div className="room_list">
             {/* 각각 채팅방 들어오면 map시킬 것 */}
             <ListGroup>
-              <ListGroupItem tag="a" href="#" action>
-                Cras justo odio
-              </ListGroupItem>
+              {users &&
+                users.map((user, key) => {
+                  <ListGroupItem tag="a" href="#" action>
+                    {user}
+                  </ListGroupItem>;
+                })}
             </ListGroup>
           </div>
         </Styled.ChatRooms>
@@ -105,7 +108,7 @@ function Chat() {
                 setCompleteRoom={setCompleteRoom}
               />
               {messageList &&
-                messageList.map((prevMessage) => {
+                messageList.map((prevMessage, key) => {
                   return <Message prevMessage={prevMessage} />;
                 })}
             </div>
