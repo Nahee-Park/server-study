@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Message from "../component/Message";
-import JoinModal from "../component/JoinModal";
 import {
   InputGroup,
   InputGroupAddon,
@@ -11,7 +10,6 @@ import {
 } from "reactstrap";
 import styled from "styled-components";
 import io from "socket.io-client";
-import { getUsers } from "../lib/Api";
 
 const ENDPOINT = "localhost:8080";
 let socket;
@@ -43,6 +41,7 @@ function Chat() {
     }
   };
 
+  // data로 유저리스트를 받았을 때 현재 유저를 가장 위로 올 수 있도록 하는 함수
   const getUserArray = (data) => {
     let tempUsers = [];
     let realUsers = [];
@@ -65,22 +64,14 @@ function Chat() {
     setUsers(realUsers);
   };
 
-  // 이 함수 실행시킬 때 user들어옴
-  const getUserData = async () => {
-    const data = await getUsers();
-    setData(data.data);
-    await getUserArray(data.data);
-  };
-
   useEffect(() => {
-    socket = io(ENDPOINT + "/" + completeRoom);
+    socket = io(ENDPOINT);
     socket.on("allMessage", (data) => {
       console.log(data);
       setMessageList([...messageList, data]);
     });
     console.log(messageList);
     console.log(users);
-    getUserData();
   }, [messageList, completeRoom]);
   console.log(users);
 
@@ -120,19 +111,7 @@ function Chat() {
         </Styled.ChatRooms>
         <Styled.ChatSpace>
           <Styled.ChatBoxes>
-            <div className="chat__btns">
-              <Button outline color="success" onClick={toggle}>
-                Join Room
-              </Button>
-            </div>
             <div className="chat__contents">
-              <JoinModal
-                modal={modal}
-                toggle={toggle}
-                setModal={setModal}
-                user={user}
-                setCompleteRoom={setCompleteRoom}
-              />
               {messageList &&
                 messageList.map((prevMessage, key) => {
                   return <Message key={key} prevMessage={prevMessage} />;
