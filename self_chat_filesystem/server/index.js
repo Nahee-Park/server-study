@@ -92,3 +92,7 @@ chatRoom.on("connection", (socket) => {
     socket.emit("allMessage", data);
   });
 });
+
+// api호출 통해 참여자들을 get해서 클라로 보내줌
+// 그럼 클라에서 그거 빋고 참여자들 리스트에 넣은다음
+// 참여자들 클릭하면 그 이름을 room 생성
