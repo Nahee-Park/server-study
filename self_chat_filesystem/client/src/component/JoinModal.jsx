@@ -11,12 +11,14 @@ import {
   Input,
 } from "reactstrap";
 
-function Join({ modal, toggle, setModal, user }) {
+function Join({ modal, toggle, setModal, setCompleteRoom }) {
   const [room, setRoom] = useState("");
+  const user = "nahee";
   const joinRoom = async () => {
     setModal(!Modal);
     // 서버로 Room post 하는 코드
     const data = await postRoom(room, user);
+    setCompleteRoom(room);
     console.log(data);
   };
 

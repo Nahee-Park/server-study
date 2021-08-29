@@ -43,10 +43,12 @@ io.on("connection", (socket) => {
   });
 });
 
-const chatRoom = io.of("/채팅방1");
-
+var roomName = "dqeqfqaquqlqtq기q본q방qroom";
 app.post("/room", (req, res) => {
   res.send(req.body);
+  // 채팅방 이름 저장해두기 -> 나중에 쓸 거임
+  roomName = "/" + req.body.room.data;
+
   //받은 room이 없는 방이면 db에 새로 추가
   db.collection("chat")
     .find({ room: req.body.room })
@@ -65,10 +67,9 @@ app.post("/room", (req, res) => {
   db.collection("chat")
     .find({ room: req.body.room })
     .toArray((error, result) => {
-      console.log(result[0].user);
+      //   console.log(result[0].user);
       const prevusers = result[0].user;
       let isUserHere = false;
-      console.log("일단 유저 있어서 배열 돌 예정임");
       prevusers.forEach((element) => {
         if (element == req.body.user) {
           isUserHere = true;
@@ -80,4 +81,14 @@ app.post("/room", (req, res) => {
           .collection("chat")
           .update({ room: req.body.room }, { $push: { user: req.body.user } });
     });
+});
+
+const chatRoom = io.of(roomName);
+chatRoom.on("connection", (socket) => {
+  console.log("방에 연결 되었어요");
+  socket.on("message", (data) => {
+    console.log("방으로 첫 메시지 왔어요");
+    console.log(data);
+    socket.emit("allMessage", data);
+  });
 });

@@ -25,15 +25,21 @@ function Chat() {
   const toggle = () => setModal(!modal);
   const [message, setMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
+  const [completeRoom, setCompleteRoom] = useState(
+    "dqeqfqaquqlqtq기q본q방qroom"
+  );
   // let messageList = [];
 
   // 메시지 세팅
   const setMessages = (e) => {
     setMessage(e.target.value);
+    console.log(message);
   };
 
   const sendMessage = (e) => {
     e.preventDefault();
+    console.log("전송 버튼 누름");
+    console.log("보내지는 메시지", message);
     if (message) {
       socket.emit("message", message, () => {
         setMessage("");
@@ -42,12 +48,14 @@ function Chat() {
   };
 
   useEffect(() => {
-    socket = io(ENDPOINT);
+    console.log(completeRoom);
+    socket = io(ENDPOINT + "/" + completeRoom);
     socket.on("allMessage", (data) => {
       console.log(data);
       setMessageList([...messageList, data]);
     });
-  }, [messageList]);
+    console.log(messageList);
+  }, [messageList, completeRoom]);
 
   return (
     <Styled.Root>
@@ -88,6 +96,7 @@ function Chat() {
                 toggle={toggle}
                 setModal={setModal}
                 user={user}
+                setCompleteRoom={setCompleteRoom}
               />
               {messageList &&
                 messageList.map((prevMessage) => {
