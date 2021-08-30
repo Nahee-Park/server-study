@@ -24,7 +24,7 @@ function Chat() {
     "dqeqfqaquqlqtq기q본q방qroom"
   );
   const [users, setUsers] = useState([]);
-  const [data, setData] = useState();
+
   // let messageList = [];
 
   // 메시지 세팅
@@ -63,6 +63,35 @@ function Chat() {
     });
     setUsers(realUsers);
   };
+
+  // 맨 처음 접속했을 때 기본적으로 가질 state
+  // user, toUser, toSocketId, isPrivate, text, userList, 로그는 뭐하는 애지
+  const [data, setData] = useState({
+    user: "nahee",
+    toUser: "",
+    toSocketId: "",
+    isPrivate: false,
+    text: "",
+    userList: [],
+    pastMessages: [],
+  });
+
+  useEffect =
+    (() => {
+      socket = io(ENDPOINT);
+      socket.on("getUserList", (arr) => {
+        setData({ userList: arr });
+      });
+
+      //모든 메시지들 받아옴
+      socket.on("fromMessage", (obj) => {
+        const temp = data.pastMessages;
+        temp.push(obj);
+
+        setData({ pastMessages: temp });
+      });
+    },
+    []);
 
   useEffect(() => {
     socket = io(ENDPOINT);

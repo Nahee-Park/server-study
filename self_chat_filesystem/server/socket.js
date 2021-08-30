@@ -52,6 +52,7 @@ io.on("connection", (socket) => {
 
   // 전체 채팅 -> toUser가 있으면 귓속말이므로 해당 소켓의 아이디를 가진 사람에게만 전달
   socket.on("toMessage", (data) => {
+    // 기본적으로 한 화면에 뿌려지므로 fromMessage이벤트로 통일
     //   toUser가 있으면 귓속말 버전으로 방출(소켓 아이디로 만든 룸에 보냄)
     if (data.toUser) {
       io.to(toSocketId).emit("fromMessage", data);
