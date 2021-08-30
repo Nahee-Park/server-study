@@ -15,9 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const mongoose = require("mongoose");
-const { info } = require("console");
 
-// mongodb://[URL of  MongoDB server]/[Name of DB to connect(make one if doesn't exist)]
 mongoose.connect(
   "mongodb+srv://admin:13243543qq@cluster0.3bsm9.mongodb.net/chatDB?retryWrites=true&w=majority"
 );
