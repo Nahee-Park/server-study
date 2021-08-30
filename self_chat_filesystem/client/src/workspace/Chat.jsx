@@ -10,6 +10,7 @@ import {
 } from "reactstrap";
 import styled from "styled-components";
 import io from "socket.io-client";
+import { getMessages, postMessages } from "../lib/Api";
 
 const ENDPOINT = "localhost:8080";
 let socket;
@@ -45,7 +46,19 @@ function Chat() {
     setUsers(realUsers);
   };
 
-  async;
+  //일단 데이터 불로와서 처리
+  const getData = async () => {
+    const Idata = await getMessages();
+    console.log(Idata);
+    // 받아온 데이터로 세팅
+    await setData({ user: Idata.user, pastMessages: Idata.pastMessages });
+    return true;
+  };
+
+  // userList갱신되면 순서 바꾸기
+  useEffect(() => {
+    getUserArray(data.user, data.userList);
+  }, [data.userList, data.user]);
 
   useEffect(() => {
     socket = io(ENDPOINT);
@@ -54,6 +67,11 @@ function Chat() {
     });
 
     // get요청으로 1.user 받기 2. pastMessages 받기 3. 그 요청들 이후 서버의 userList 갱신을 위한 enterRoom 이벤트 보내기 4. getUserArray갱신
+    const dataHere = getData();
+    dataHere &&
+      socket.emit("enterRoom", {
+        username: data.user,
+      });
 
     //모든 메시지들 받아옴
     socket.on("fromMessage", (obj) => {
@@ -75,8 +93,23 @@ function Chat() {
       sendMessage();
     }
   };
+
+  const toMessageEmit = (nowData) => {
+    // 만약 귓속말이면 그 소켓 아이디 추가해서 toMessage 이벤트 보냄
+    if (data.toUser) {
+      nowData.toSocketId = data.toSocketId;
+    }
+    socket.emit("toMessage", nowData);
+    setData({
+      toUser: "",
+      isPrivate: false,
+      message: "",
+      toSocketId: "",
+    });
+  };
+
   // 클릭시 메시지 보냄
-  const sendMessage = (e) => {
+  const sendMessage = async (e) => {
     e.preventDefault();
 
     const nowData = {
@@ -90,16 +123,9 @@ function Chat() {
       nowData.toUser = data.toUser;
     }
 
-    // 궁금사항) 꼭 데이터 post한 이후에 저게 이뤄질 필요가 있나?
-    // 메시지 데이터 post
-
-    // post 한 이후 귓속말이면 nowData에 socket ID추가
-
-    // 현재 상태 toMessage이벤트로 emit
-
-    // 초기화
-
-    // 에러 잡기
+    // 메시지 데이터 post하고 귓속말이면 소켓 아이디 추가해서 이벤트 emit(소켓 아이디는 디비에 저장될 필요 없다)
+    await postMessages(nowData);
+    await toMessageEmit(nowData);
   };
 
   // 참여자 클릭하면 그 참여자 이름 toUser에 저장
