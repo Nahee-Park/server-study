@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 
+// 여기엔 data.user 와 현재 채팅메시지의 user, text, isPrivate여부, toUser, key 보냄
 function Message({ prevMessage }) {
   // { message: { text, user }, name }
   const user = "nahee";

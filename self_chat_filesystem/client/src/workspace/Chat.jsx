@@ -15,31 +15,17 @@ const ENDPOINT = "localhost:8080";
 let socket;
 
 function Chat() {
-  const user = "nahee";
-  const [modal, setModal] = useState(false);
-  const toggle = () => setModal(!modal);
-  const [message, setMessage] = useState("");
-  const [messageList, setMessageList] = useState([]);
-  const [completeRoom, setCompleteRoom] = useState(
-    "dqeqfqaquqlqtq기q본q방qroom"
-  );
-  const [users, setUsers] = useState([]);
-
-  // let messageList = [];
-
-  // 메시지 세팅
-  const setMessages = (e) => {
-    setMessage(e.target.value);
-  };
-
-  const sendMessage = (e) => {
-    e.preventDefault();
-    if (message) {
-      socket.emit("message", message, () => {
-        setMessage("");
-      });
-    }
-  };
+  // 맨 처음 접속했을 때 기본적으로 가질 state
+  // user, toUser, toSocketId, isPrivate, text, userList, 로그는 뭐하는 애지
+  const [data, setData] = useState({
+    user: "nahee",
+    toUser: "",
+    toSocketId: "",
+    isPrivate: false,
+    text: "",
+    userList: [],
+    pastMessages: [],
+  });
 
   // data로 유저리스트를 받았을 때 현재 유저를 가장 위로 올 수 있도록 하는 함수
   const getUserArray = (data) => {
@@ -64,49 +50,73 @@ function Chat() {
     setUsers(realUsers);
   };
 
-  // 맨 처음 접속했을 때 기본적으로 가질 state
-  // user, toUser, toSocketId, isPrivate, text, userList, 로그는 뭐하는 애지
-  const [data, setData] = useState({
-    user: "nahee",
-    toUser: "",
-    toSocketId: "",
-    isPrivate: false,
-    text: "",
-    userList: [],
-    pastMessages: [],
-  });
-
-  useEffect =
-    (() => {
-      socket = io(ENDPOINT);
-      socket.on("getUserList", (arr) => {
-        setData({ userList: arr });
-      });
-
-      //모든 메시지들 받아옴
-      socket.on("fromMessage", (obj) => {
-        const temp = data.pastMessages;
-        temp.push(obj);
-
-        setData({ pastMessages: temp });
-      });
-    },
-    []);
-
   useEffect(() => {
     socket = io(ENDPOINT);
-    socket.on("allMessage", (data) => {
-      console.log(data);
-      setMessageList([...messageList, data]);
+    socket.on("getUserList", (arr) => {
+      setData({ userList: arr });
     });
-    console.log(messageList);
-    console.log(users);
-  }, [messageList, completeRoom]);
-  console.log(users);
 
+    // get요청으로 1.user 받기 2. pastMessages 받기 3. 그 요청들 이후 서버의 userList 갱신을 위한 enterRoom 이벤트 보내기
+
+    //모든 메시지들 받아옴
+    socket.on("fromMessage", (obj) => {
+      const temp = data.pastMessages;
+      temp.push(obj);
+
+      setData({ pastMessages: temp });
+    });
+  }, []);
+
+  // 메시지 세팅
+  const setMessages = (e) => {
+    setData({ message: e.target.value });
+  };
+
+  // 엔터 누르면 메시지 보내도록
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+  // 클릭시 메시지 보냄
+  const sendMessage = (e) => {
+    e.preventDefault();
+
+    const nowData = {
+      user: data.user,
+      isPrivate: data.isPrivate,
+      text: data.text,
+    };
+
+    // 받을 사람 클릭한 상태이면 toUser추가
+    if (data.toUser) {
+      nowData.toUser = data.toUser;
+    }
+
+    // 궁금사항) 꼭 데이터 post한 이후에 저게 이뤄질 필요가 있나?
+    // 메시지 데이터 post
+
+    // post 한 이후 귓속말이면 nowData에 socket ID추가
+
+    // 현재 상태 toMessage이벤트로 emit
+
+    // 초기화
+
+    // 에러 잡기
+  };
+
+  // 참여자 클릭하면 그 참여자 이름 toUser에 저장
   const joinPrivate = (e) => {
-    // 참여자를 클릭하면 그 참여자 이름으로 private room만들기
     console.log(e.target.name);
+    if (e.target.name === data.user) {
+      alert("자신에게는 귓속말을 보낼 수 없습니다!");
+    } else {
+      setData({
+        isPrivate: true,
+        toUser: e.target.name,
+        toSocketId: e.target.name.socketId,
+      });
+    }
     socket.emit("private", e.target.name);
   };
 
@@ -118,7 +128,8 @@ function Chat() {
             <h4>참여자 목록</h4>
           </div>
           <div className="room_list">
-            {/* 각각 채팅방 들어오면 map시킬 것 */}
+            {/* userList map시킬 것*/}
+            {/* userList map시킬 것 -> 첫번째 유저는 아예 따로 테그 빼서 스타일링 다르게 주면 좋을듯*/}
             <ListGroup>
               {users &&
                 users.map((user, key) => {
@@ -141,6 +152,7 @@ function Chat() {
         <Styled.ChatSpace>
           <Styled.ChatBoxes>
             <div className="chat__contents">
+              {/* data.pastMessages에서 가져와서 돌릴 것*/}
               {messageList &&
                 messageList.map((prevMessage, key) => {
                   return <Message key={key} prevMessage={prevMessage} />;
@@ -150,8 +162,9 @@ function Chat() {
           <InputGroup>
             <Input
               placeholder="전송할 메시지를 적어주세요"
-              value={message}
+              value={data.text}
               onChange={setMessages}
+              onKeyPress={handleKeyPress}
             />
             <InputGroupAddon addonType="append">
               <Button color="secondary" onClick={sendMessage}>
