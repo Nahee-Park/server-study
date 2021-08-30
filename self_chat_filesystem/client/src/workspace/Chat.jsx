@@ -27,19 +27,14 @@ function Chat() {
     pastMessages: [],
   });
 
+  const [users, setUsers] = useState([]);
+
   // data로 유저리스트를 받았을 때 현재 유저를 가장 위로 올 수 있도록 하는 함수
-  const getUserArray = (data) => {
-    let tempUsers = [];
+  const getUserArray = (user, userList) => {
     let realUsers = [];
-    for (let i = 0; i < data.length; i++) {
-      if (data[i].room === completeRoom) {
-        tempUsers = data[i].user;
-        // setUsers(data[i].user);
-      }
-    }
     let i = 1;
     // 현재 유저를 가장 위로 저장하고 나머지는 그 밑으로 오도록
-    tempUsers.forEach((element) => {
+    userList.forEach((element) => {
       if (element === user) {
         realUsers[0] = element;
       } else {
@@ -50,13 +45,15 @@ function Chat() {
     setUsers(realUsers);
   };
 
+  async;
+
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.on("getUserList", (arr) => {
       setData({ userList: arr });
     });
 
-    // get요청으로 1.user 받기 2. pastMessages 받기 3. 그 요청들 이후 서버의 userList 갱신을 위한 enterRoom 이벤트 보내기
+    // get요청으로 1.user 받기 2. pastMessages 받기 3. 그 요청들 이후 서버의 userList 갱신을 위한 enterRoom 이벤트 보내기 4. getUserArray갱신
 
     //모든 메시지들 받아옴
     socket.on("fromMessage", (obj) => {
@@ -124,11 +121,10 @@ function Chat() {
     <Styled.Root>
       <Styled.ChatWrapper>
         <Styled.ChatRooms>
-          <div className="room_title">
+          <div className="participants_title">
             <h4>참여자 목록</h4>
           </div>
-          <div className="room_list">
-            {/* userList map시킬 것*/}
+          <div className="participants_list">
             {/* userList map시킬 것 -> 첫번째 유저는 아예 따로 테그 빼서 스타일링 다르게 주면 좋을듯*/}
             <ListGroup>
               {users &&
@@ -153,8 +149,8 @@ function Chat() {
           <Styled.ChatBoxes>
             <div className="chat__contents">
               {/* data.pastMessages에서 가져와서 돌릴 것*/}
-              {messageList &&
-                messageList.map((prevMessage, key) => {
+              {data.pastMessages &&
+                data.pastMessages.map((prevMessage, key) => {
                   return <Message key={key} prevMessage={prevMessage} />;
                 })}
             </div>
@@ -193,7 +189,7 @@ const Styled = {
     width: 30%;
     height: 100%;
     background-color: beige;
-    .room {
+    .participants {
       &_title {
         display: flex;
         flex-direction: column;
