@@ -21,7 +21,7 @@
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
     <script>
-      $(".delete").click(function () {
+      $(".delete").click(function (e) {
         $.ajax({
           method: "DELETE",
           url: "/delete",

@@ -94,6 +94,28 @@ app.delete("/delete", (req, res) => {
   console.log(req.body);
   db.collection("post").deleteOne(req.body, (error, result) => {
     console.log("삭제 완료");
+    // 데이터 삭제한 이후에 totalPost 카운트 감소시킴
+    db.collection("counter").updateOne(
+      { name: "게시물 갯수" },
+      // $inc totalPost 1 증가시키는 operator 문법
+      { $dec: { totalPost: 1 } },
+      (error, result) => {
+        console.log("삭제 후 토탈게시글 갯수 완료");
+      }
+    );
   });
   res.send("삭제 완료");
+});
+
+// /detail1, 2, 3, 4 ... 로 접속하면 detail.ejs 보여줌
+app.get("/detail/:id", (req, res) => {
+  // id가 1인 걸 찾아와서 그 결과 콘솔창에 출력
+  //url의 파라미터 중에 :id를 찾아서 넣어달라는 뜻
+  db.collection("post").findOne(
+    { _id: parseInt(req.params.id) },
+    function (err, result) {
+      console.log(result);
+      res.render("detail.ejs", { data: result });
+    }
+  );
 });
