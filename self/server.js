@@ -3,6 +3,8 @@ const express = require("express");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
+// 환경변수 사용할 수 있도록 하는 라이브러리
+require("dotenv").config();
 
 // 라이브러리를 바탕으로 객체 설정
 const app = express();
@@ -11,21 +13,18 @@ const MongoClient = require("mongodb").MongoClient;
 // 뷰 엔진으로 ejs를 쓰겠다는 뜻
 app.set("view engine", "ejs");
 
-MongoClient.connect(
-  "mongodb+srv://admin:13243543qq@cluster0.3bsm9.mongodb.net/todoapp?retryWrites=true&w=majority",
-  (error, client) => {
-    // 데이터 연결되면 할 일
-    if (error) return console.log(error);
+MongoClient.connect(process.env.DB_URL, (error, client) => {
+  // 데이터 연결되면 할 일
+  if (error) return console.log(error);
 
-    // db연결
-    db = client.db("todoapp");
+  // db연결
+  db = client.db("todoapp");
 
-    // 데이터 들어오면 서버 띄우기 , 외부에서 이 포트로 들어왔을 때 어떤 행위할 지를 알려줌
-    app.listen(8080, () => {
-      console.log("listening on 8080");
-    });
-  }
-);
+  // 데이터 들어오면 서버 띄우기 , 외부에서 이 포트로 들어왔을 때 어떤 행위할 지를 알려줌
+  app.listen(process.env.PORT, () => {
+    console.log("listening on 8080");
+  });
+});
 
 // req 풀기 위한 코드 (미들웨어가 요청 받은 것들을 풀어줘야 서버에서 해석 가능)
 app.use(express.urlencoded({ extended: true }));
