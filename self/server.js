@@ -139,10 +139,15 @@ app.get("/login", (req, res) => {
   res.render("login.ejs");
 });
 
-// login경로로 post시 /페이지로 리다이렉트 되도록
-app.post("/login", (req, res) => {
-  res.redirect("/");
-});
+// login경로로 post시 미들웨어 함수인 passport를 지나 /페이지로 리다이렉트 되도록
+app.post(
+  "/login",
+  passport.authenticate("local", { failureREdirect: "/faiil" }),
+  (req, res) => {
+    res.redirect("/");
+    console.log("로그인 포스트 잘 되었어요");
+  }
+);
 
 // 어떻게 인증할 건지에 대한 세부 코드
 passport.use(
@@ -157,7 +162,7 @@ passport.use(
     },
     // 아이디 비번 검사하는 코드
     function (inputName, inputPw, done) {
-      console.log(입력한아이디, 입력한비번);
+      console.log(inputName, inputPw);
       // 일단 아이디를 키로 해서 찾기 때문에 없으면 에러를 보냄
       db.collection("login").findOne(
         { name: inputName },
@@ -182,9 +187,31 @@ passport.use(
 
 //유저의 아이디 데이터를 바탕으로 세션 데이터를 만들어 줌 -> 그 세션 데이터의 아이디를 쿠키로 만들어서 사용자의 브라우저로 보내줌
 passport.serializeUser(function (user, done) {
+  console.log("세션 데이터 만들어주는 중");
   done(null, user.name);
 });
 
+// passport.deserializeUser -> 세션 아이디를 바탕으로 이 유저의 정보를 DB에서 찾아달라는 역할을 하는 함수
 passport.deserializeUser(function (name, done) {
-  done(null, {});
+  db.collection("login").findOne({ name: name }, (err, result) => {
+    done(null, result);
+  });
+});
+
+// 미들웨어용 함수
+const isLogin = (req, res, next) => {
+  // req.user(deserializeUser가 보내준 로그인한 유저의 DB데이터)가 있으면 next롵 통과, 아니면 에러메시지를 응답해주세요 라는 뜻
+  if (req.user) {
+    next();
+  } else {
+    res.send("로그인하지 않으셨습니다.");
+  }
+};
+
+// /mypage접속 시 이 페이지로 라우팅, 미들웨어 함수를 넣으면 해당 함수를 거쳐서 이 코드가 실행됨
+app.get("/mypage", isLogin, (req, res) => {
+  console.log("mypage get 잘 되었어요");
+  console.log(req.user);
+  // 사실상 이런 방식의 라우팅은 라우팅하는 주소로 들어갈 때 서버가 클라로 보낸 데이터가 바로 꽂혀서 들어감 , 그냥 자체 ssr같은 고런 느낌..
+  res.render("mypage.ejs", { user: req.user });
 });
